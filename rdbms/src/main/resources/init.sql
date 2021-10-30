@@ -1,11 +1,11 @@
 --liquibase formatted sql
 
---changeset rrmasgutov:init
+--changeset rsbryanskiy:init
 
 create table account1
 (
     id bigserial constraint account_pk primary key,
-    amount int,
+    amount int constraint positive_amount CHECK (amount >= 0),
     version int
 );
 

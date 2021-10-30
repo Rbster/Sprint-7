@@ -1,5 +1,7 @@
 databaseChangeLog:
   - include:
-      file: init.sql
+      file: src/main/resources/init.sql
+  - include:
+      file: src/main/resources/index.sql
 
 
