@@ -3,23 +3,31 @@ package ru.sber.rdbms
 import java.sql.DriverManager
 
 class TransferConstraint {
-    val connection = DriverManager.getConnection(
-        "jdbc:postgresql://localhost:5432/db",
-        "postgres",
-        "postgres"
-    )
+
     fun transfer(accountId1: Long, accountId2: Long, amount: Long) {
+        val connection = DriverManager.getConnection(
+            "jdbc:postgresql://localhost:5432/db",
+            "postgres",
+            "postgres"
+        )
         connection.use { conn ->
-            val prepareStatement = conn.prepareStatement("select 1")
-            prepareStatement.use { statement ->
-                val resultSet = statement.executeQuery()
-                resultSet.use {
-                    println("Has result: ${it.next()}")
-                    val result = it.getInt(1)
-                    println("Execution result: $result")
+            val takeMoneyStatement = conn.prepareStatement(
+                "UPDATE account1 SET amount = amount - $amount WHERE id = $accountId1"
+            )
+            val giveMoneyStatement = conn.prepareStatement(
+                "UPDATE account1 SET amount = amount + $amount WHERE id = $accountId2"
+            )
+
+            try {
+                takeMoneyStatement.use {
+                    it.execute()
                 }
+                giveMoneyStatement.use {
+                    it.execute()
+                }
+            } catch (e: Exception) {
+                error(e.stackTrace)
             }
         }
-        TODO()
     }
 }
