@@ -20,7 +20,8 @@ fun main() {
 //        }
 //    }
 //    TransferConstraint().transfer(1, 2, 100)
-    TransferOptimisticLock().transfer(1, 2, 100)
+//    TransferOptimisticLock().transfer(1, 2, 100)
+    TransferPessimisticLock().transfer(1, 2, 100)
 
 }
 

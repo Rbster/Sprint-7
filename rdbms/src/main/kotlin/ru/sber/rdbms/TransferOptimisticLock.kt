@@ -1,6 +1,5 @@
 package ru.sber.rdbms
 
-import java.lang.Thread.sleep
 import java.sql.DriverManager
 
 class TransferOptimisticLock {
@@ -11,7 +10,7 @@ class TransferOptimisticLock {
             "postgres"
         )
 
-        data class DataRow(val id: Long, var amount: Int, var version: Int)
+        data class DataRow(val id: Long, var amount: Long, var version: Long)
 
         connection.use { conn ->
             conn.autoCommit = false
@@ -27,51 +26,50 @@ class TransferOptimisticLock {
                     it.next()
                     fromRow = DataRow(
                         accountId1,
-                        it.getInt("amount"),
-                        it.getInt("version")
+                        it.getLong("amount"),
+                        it.getLong("version")
                     )
                 }
             }
-            print("kik")
             statementGetAccount2.use { account2 ->
                 account2.executeQuery().use {
                     it.next()
                     toRow = DataRow(
                         accountId2,
-                        it.getInt("amount"),
-                        it.getInt("version")
+                        it.getLong("amount"),
+                        it.getLong("version")
                     )
                 }
             }
 
             if (fromRow.amount < amount) {
-                throw Exception("Not enough money")
+                throw DBException(DBExceptionValue.NOT_ENOUGH_MONEY)
             }
 
             val takeMoneyStatement = conn.prepareStatement(
-                "UPDATE account1 SET amount = amount - $amount, version = version + 1 WHERE id = $accountId1 AND version = ${fromRow.version}"
+                "UPDATE account1 SET amount = ${fromRow.amount - amount}, version = ${fromRow.version + 1} WHERE id = $accountId1 AND version = ${fromRow.version}"
             )
             val giveMoneyStatement = conn.prepareStatement(
-                "UPDATE account1 SET amount = amount + $amount, version = version + 1 WHERE id = $accountId2 AND version = ${toRow.version}")
+                "UPDATE account1 SET amount = ${toRow.amount + amount}, version = ${toRow.version + 1} WHERE id = $accountId2 AND version = ${toRow.version}")
 
             try {
-                sleep(5000)
+//                sleep(5000)
                 takeMoneyStatement.use {
                     it.execute()
                     if (it.updateCount == 0) {
-                        throw Exception("nooo")
+                        throw DBException(DBExceptionValue.WAS_MODIFIED)
                     }
                 }
                 giveMoneyStatement.use {
                     it.execute()
                     if (it.updateCount == 0) {
-                        throw Exception("nooo")
+                        throw DBException(DBExceptionValue.WAS_MODIFIED)
                     }
                 }
                 conn.commit()
-            } catch (e: Exception) {
+            } catch (e: DBException) {
                 conn.rollback()
-                throw Exception("there was update")
+                throw DBException(DBExceptionValue.WAS_MODIFIED)
             }
         }
     }

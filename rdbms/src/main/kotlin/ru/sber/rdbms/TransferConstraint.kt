@@ -26,7 +26,7 @@ class TransferConstraint {
                     it.execute()
                 }
             } catch (e: Exception) {
-                error(e.stackTrace)
+                throw DBException(DBExceptionValue.NOT_ENOUGH_MONEY)
             }
         }
     }
