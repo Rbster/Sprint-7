@@ -1,7 +1,10 @@
 package ru.sber.orm.persistence
 
-import org.hibernate.SessionFactory
+import org.hibernate.annotations.*
+import org.hibernate.annotations.CascadeType
 import javax.persistence.*
+import javax.persistence.Entity
+
 
 @Entity(name = "movie")
 data class Movie(
@@ -10,19 +13,20 @@ data class Movie(
     @Column(name = "movie_id")
     var id: Long? = null,
 
-    @Column
+    @Column(unique = true)
     var title: String? = null,
 
-//    @Column
-    @ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "movie_actor",
         joinColumns = [JoinColumn(name = "movie_id")],
         inverseJoinColumns = [JoinColumn(name = "actor_id")]
     )
+    @Fetch(FetchMode.SUBSELECT)  // cure N + 1
+    @Cascade(CascadeType.SAVE_UPDATE, CascadeType.MERGE, CascadeType.PERSIST)
     var cast: List<Actor> = listOf(),
 
-//    @Column
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
+    @Cascade(CascadeType.SAVE_UPDATE, CascadeType.MERGE, CascadeType.PERSIST)
     var genre: Genre? = null
 )
 
@@ -33,11 +37,11 @@ data class Actor(
     @Column(name = "actor_id")
     var id: Long? = null,
 
-    @Column
+    @NaturalId
     var fullname: String? = null,
 
-//    @Column(name = "performed_in")
-    @ManyToMany(mappedBy = "cast")
+    @ManyToMany(mappedBy = "cast", fetch = FetchType.EAGER)
+    @Cascade(CascadeType.SAVE_UPDATE, CascadeType.MERGE, CascadeType.PERSIST)
     var performedIn: List<Movie> = listOf()
 )
 
@@ -48,11 +52,11 @@ data class Genre(
     @Column(name = "genre_id")
     var id: Long? = null,
 
-    @Column
+    @NaturalId
     var name: String? = null,
 
-//    @Column
-    @OneToMany(mappedBy = "genre")
+    @OneToMany(mappedBy = "genre", fetch = FetchType.EAGER)
+    @Cascade(CascadeType.SAVE_UPDATE, CascadeType.MERGE, CascadeType.PERSIST)
     var movies: List<Movie> = listOf()
 )
 
