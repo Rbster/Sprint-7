@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<table>
+    <thead>
+    <tr>
+        <th> Name </th>
+        <th> Address </th>
+    </tr>
+    </thead>
+    <tbody>
+
+<!--    <tr>-->
+<!--        <td><span th:text="${element.name}"> New name </span></td>-->
+<!--        <td><span th:text="${element.address}"> New address </span></td>-->
+<!--    </tr>-->
+    <form action="#" th:action="@{/app/{id}/edit(id=${id})}" method="post">
+        <tr>
+            <td><input name="name"> Name </input></td>
+            <td><input name="address"> Address </input></td>
+        </tr>
+    <tr>
+        <td>
+            <button> Conform </button>
+        </td>
+    </tr>
+    </form>
+    <tr>
+        <td>
+            <form action="#" th:action="@{/app/list}" method="get"><button> Cancel </button> </form>
+        </td>
+    </tr>
+
+
+    </tbody>
+
+</table>
+</body>
+</html>

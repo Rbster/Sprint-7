@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<table>
+    <thead>
+    <tr>
+        <th> Name </th>
+        <th> Address </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${list_of_elements.empty}">
+        <td colspan="2"> No addresses Available </td>
+    </tr>
+    <tr th:each="elem : ${list_of_elements}">
+        <td><span th:text="${elem.second.name}"> Name </span></td>
+        <td><span th:text="${elem.second.address}"> Address </span></td>
+        <td>
+            <form th:action="@{/app/{id}/view(id=${elem.first})}" method="get">
+                <button th:text="|View ${elem.first}|"> id </button>
+            </form>
+        </td>
+        <td>
+            <form th:action="@{/app/{id}/edit/form(id=${elem.first})}" method="get">
+                <button th:text="|Edit ${elem.first}|"> id </button>
+            </form>
+        </td>
+        <td>
+            <form th:action="@{/app/{id}/delete(id=${elem.first})}" method="get">
+                <button th:text="|Delete ${elem.first}|"> id </button>
+            </form>
+        </td>
+    </tr>
+        <form action="#" th:action="@{/app/add}" method="post">
+        <tr>
+            <td><input name="name"> Name </input></td>
+            <td><input name="address"> Address </input></td>
+            <td><button> Add </button></td>
+        </tr>
+        </form>
+    </tbody>
+
+</table>
+</body>
+</html>
