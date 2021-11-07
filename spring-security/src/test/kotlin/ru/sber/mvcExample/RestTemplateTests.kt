@@ -1,5 +1,7 @@
 package ru.sber.mvcExample
 
+/*
+
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -14,8 +16,8 @@ import ru.sber.mvcExample.repository.AddressBookRepository
 import ru.sber.mvcExample.repository.AddressInfo
 import ru.sber.mvcExample.repository.AddressSearchForm
 import ru.sber.mvcExample.repository.LoginFormModel
-
-
+*/
+/*
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class RestTemplateTests {
     @LocalServerPort
@@ -216,3 +218,4 @@ class RestTemplateTests {
         assertThat(resp.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
     }
 }
+*/
