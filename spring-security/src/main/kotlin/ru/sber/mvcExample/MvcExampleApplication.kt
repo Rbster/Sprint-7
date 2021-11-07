@@ -35,12 +35,17 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
 			.password(passwordEncoder().encode("user"))
 			.authorities("IS_AUTHENTICATED")
 			.build()
+		val apiUser = User.builder()
+			.username("apiUser")
+			.password(passwordEncoder().encode("user"))
+			.roles("API")
+			.build()
 		val admin = User.builder()
 			.username("admin")
 			.password(passwordEncoder().encode("user"))
 			.roles("ADMIN")
 			.build()
-		return InMemoryUserDetailsManager(user, admin)
+		return InMemoryUserDetailsManager(user, apiUser, admin)
 	}
 
 	@Bean
