@@ -7,6 +7,8 @@ import org.springframework.boot.web.servlet.ServletRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Scope
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
@@ -21,6 +23,8 @@ import org.springframework.stereotype.Component
 import org.springframework.web.servlet.config.annotation.EnableWebMvc
 import java.time.Clock
 import org.springframework.security.config.web.servlet.invoke
+import org.springframework.security.provisioning.JdbcUserDetailsManager
+import javax.sql.DataSource
 
 @EnableWebSecurity
 class SecurityConfig : WebSecurityConfigurerAdapter() {
@@ -28,7 +32,15 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
 	private var authenticationEntryPoint: MyBasicAuthenticationEntryPoint? = null
 
 	@Bean
-	fun users(): UserDetailsService {
+	fun dataSource(): DataSource {
+		return EmbeddedDatabaseBuilder()
+			.setType(EmbeddedDatabaseType.H2)
+			.addScript("classpath:static/users.ddl")
+			.build()
+	}
+
+	@Bean
+	fun users(dataSource: DataSource): UserDetailsService {
 		// The builder will ensure the passwords are encoded before saving in memory
 		val user = User.builder()
 			.username("user")
@@ -45,7 +57,13 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
 			.password(passwordEncoder().encode("user"))
 			.roles("ADMIN")
 			.build()
-		return InMemoryUserDetailsManager(user, apiUser, admin)
+
+		val users = JdbcUserDetailsManager(dataSource)
+		users.createUser(user)
+		users.createUser(apiUser)
+		users.createUser(admin)
+
+		return users
 	}
 
 	@Bean
