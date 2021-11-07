@@ -1,5 +1,6 @@
 package ru.sber.mvcExample.repository
 
+import org.springframework.security.access.prepost.PostAuthorize
 import org.springframework.stereotype.Component
 import java.util.concurrent.ConcurrentHashMap
 
@@ -37,6 +38,7 @@ class AddressBookRepository {
             null
         }
     }
+    @PostAuthorize("hasRole('ADMIN')")
     fun delete(id: String): Boolean {
         return  try { repoRealisation.remove(id) != null } catch (e: Exception) { false }
     }
