@@ -34,46 +34,55 @@ class LoggingFilter : Filter {
     }
 }
 
-@Component
-@Order(2)
-class AuthFilter : Filter {
-    lateinit var clock: Clock
-    @Autowired set
+//@Component
+//@Order(2)
+//class RedirectingFilter : Filter {
+//    override fun doFilter(request: ServletRequest?, response: ServletResponse?, chain: FilterChain?) {
+//        val httpResponse = response as HttpServletResponse
+//        httpResponse.sendRedirect("/app/list")
+//    }
+//}
 
-    override fun doFilter(request: ServletRequest?, response: ServletResponse?, chain: FilterChain?) {
-        println("-----> Filtering in AuthFilter")
-        val httpRequest = request as HttpServletRequest
-        val httpResponse = response as HttpServletResponse
-        var cookie: Cookie? = null
-        val loginURI = request.contextPath + "/alt/login/form"
-        val authURI = request.contextPath + "/alt/login/auth"
-
-        val requestURI = request.requestURI
-
-        if (httpRequest.cookies != null) {
-            for (q in httpRequest.cookies) {
-                if (q.name == "auth") {
-                    cookie = q
-                }
-            }
-        }
-        println("---------- cookie = ${cookie?.name} : ${cookie?.value} ")
-        if (requestURI != loginURI
-            && requestURI != authURI
-            && (cookie == null ||
-                    Instant.from(
-                        DateTimeFormatter.ISO_INSTANT.parse(cookie.value)
-                    ) >= clock.instant() )) {
-            // redirect
-
-            println("<----- redirect from AuthFilter")
-            httpResponse.sendRedirect(loginURI)
-
-        } else {
-            chain!!.doFilter(request, response)
-        }
-        println("<----- out AuthFilter")
-    }
-
-}
+//@Component
+//@Order(2)
+//class AuthFilter : Filter {
+//    lateinit var clock: Clock
+//    @Autowired set
+//
+//    override fun doFilter(request: ServletRequest?, response: ServletResponse?, chain: FilterChain?) {
+//        println("-----> Filtering in AuthFilter")
+//        val httpRequest = request as HttpServletRequest
+//        val httpResponse = response as HttpServletResponse
+//        var cookie: Cookie? = null
+//        val loginURI = request.contextPath + "/alt/login/form"
+//        val authURI = request.contextPath + "/alt/login/auth"
+//
+//        val requestURI = request.requestURI
+//
+//        if (httpRequest.cookies != null) {
+//            for (q in httpRequest.cookies) {
+//                if (q.name == "auth") {
+//                    cookie = q
+//                }
+//            }
+//        }
+//        println("---------- cookie = ${cookie?.name} : ${cookie?.value} ")
+//        if (requestURI != loginURI
+//            && requestURI != authURI
+//            && (cookie == null ||
+//                    Instant.from(
+//                        DateTimeFormatter.ISO_INSTANT.parse(cookie.value)
+//                    ) >= clock.instant() )) {
+//            // redirect
+//
+//            println("<----- redirect from AuthFilter")
+//            httpResponse.sendRedirect(loginURI)
+//
+//        } else {
+//            chain!!.doFilter(request, response)
+//        }
+//        println("<----- out AuthFilter")
+//    }
+//
+//}
 

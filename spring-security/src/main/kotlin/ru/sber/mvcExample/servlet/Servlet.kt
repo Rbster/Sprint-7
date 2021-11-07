@@ -42,7 +42,7 @@ class LoginServlet(private val clock: Clock) : HttpServlet() {
 //                println("----->ClassPAth $url")
 //            }
 //            println("------>ClassPath size = ${(Thread.currentThread().contextClassLoader as URLClassLoader).urLs.size}")
-            Paths.get("spring-mvc/src/main/resources/templates/login.html").inputStream().use { inputStream ->
+            Paths.get("spring-security/src/main/resources/templates/login.html").inputStream().use { inputStream ->
                 inputStream.transferTo(outputStream)
             }
             outputStream.flush()
