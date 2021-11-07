@@ -94,10 +94,10 @@ class MvcExampleApplicationTests {
 		mockMvc
 			.perform(
 				get("/app/id2/view")
-					.cookie(Cookie("auth", "2021-10-22T09:50:55.985703Z")))
+			)
 			.andDo(print())
 			.andExpect(status().isOk)
-			.andExpect(content().contentType("text/html;charset=UTF-8"))
+//			.andExpect(content().contentType("text/html;charset=UTF-8"))
 	}
 
 

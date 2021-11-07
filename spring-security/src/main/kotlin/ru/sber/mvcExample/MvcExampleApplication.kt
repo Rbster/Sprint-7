@@ -40,21 +40,20 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
 	}
 
 	@Bean
-	fun users(dataSource: DataSource): UserDetailsService {
-		// The builder will ensure the passwords are encoded before saving in memory
+	fun users(dataSource: DataSource, passwordEncoder: PasswordEncoder): UserDetailsService {
 		val user = User.builder()
 			.username("user")
-			.password(passwordEncoder().encode("user"))
+			.password(passwordEncoder.encode("user"))
 			.authorities("IS_AUTHENTICATED")
 			.build()
 		val apiUser = User.builder()
 			.username("apiUser")
-			.password(passwordEncoder().encode("user"))
+			.password(passwordEncoder.encode("user"))
 			.roles("API")
 			.build()
 		val admin = User.builder()
 			.username("admin")
-			.password(passwordEncoder().encode("user"))
+			.password(passwordEncoder.encode("user"))
 			.roles("ADMIN")
 			.build()
 
@@ -97,56 +96,9 @@ class MyBasicAuthenticationEntryPoint : BasicAuthenticationEntryPoint() {
 	}
 }
 
-
-
-//@Configuration
-//@EnableWebSecurity
-//class CustomWebSecurityConfigurerAdapter : WebSecurityConfigurerAdapter() {
-//	@Autowired
-//	private val authenticationEntryPoint: MyBasicAuthenticationEntryPoint? = null
-//	@Autowired
-//	@Throws(Exception::class)
-//	fun configureGlobal(auth: AuthenticationManagerBuilder) {
-//		auth.inMemoryAuthentication()
-//			.withUser("user1").password(passwordEncoder().encode("user1Pass"))
-//			.authorities("ROLE_USER")
-//	}
-//
-//	@Throws(Exception::class)
-//	override fun configure(http: HttpSecurity) {
-//		http.authorizeRequests()
-//			.antMatchers("/securityNone").permitAll()
-//			.anyRequest().authenticated()
-//			.and()
-//			.httpBasic()
-//			.authenticationEntryPoint(authenticationEntryPoint)
-////		http.addFilterAfter(
-////			CustomFilter(),
-////			BasicAuthenticationFilter::class.java
-////		)
-//	}
-//
-//	@Bean
-//	fun passwordEncoder(): PasswordEncoder {
-//		return BCryptPasswordEncoder()
-//	}
-//}
-
-
 @SpringBootApplication
 @EnableWebMvc
 class MvcExampleApplication {
-//	@Bean
-//	fun loginServletBean(clock: Clock): ServletRegistrationBean<*> {
-//		val bean: ServletRegistrationBean<*> = ServletRegistrationBean(
-//			LoginServlet(clock),
-//			"/alt/login/*"
-//		)
-//		bean.setLoadOnStartup(1)
-//		println("----->" + bean.servletName)
-//		return bean
-//	}
-
 	@Bean
 	@Scope("singleton")
 	fun clock(): Clock {
