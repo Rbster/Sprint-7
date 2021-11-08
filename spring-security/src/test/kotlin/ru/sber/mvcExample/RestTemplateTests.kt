@@ -1,55 +1,75 @@
 package ru.sber.mvcExample
+
+
+
+import org.assertj.core.api.AssertionsForClassTypes.assertThat
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.boot.web.server.LocalServerPort
+import org.springframework.core.ParameterizedTypeReference
+import org.springframework.http.*
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+import ru.sber.mvcExample.repository.AddressBookRepository
+import ru.sber.mvcExample.repository.AddressInfo
+import ru.sber.mvcExample.repository.AddressSearchForm
+import ru.sber.mvcExample.repository.LoginFormModel
+
+
+
 //
-//
-//
-//import org.assertj.core.api.AssertionsForClassTypes.assertThat
-//import org.junit.jupiter.api.AfterEach
-//import org.junit.jupiter.api.BeforeEach
-//import org.junit.jupiter.api.Test
-//import org.springframework.beans.factory.annotation.Autowired
-//import org.springframework.boot.test.context.SpringBootTest
-//import org.springframework.boot.test.web.client.TestRestTemplate
-//import org.springframework.boot.web.server.LocalServerPort
-//import org.springframework.core.ParameterizedTypeReference
-//import org.springframework.http.*
-//import ru.sber.mvcExample.repository.AddressBookRepository
-//import ru.sber.mvcExample.repository.AddressInfo
-//import ru.sber.mvcExample.repository.AddressSearchForm
-//import ru.sber.mvcExample.repository.LoginFormModel
-//
-//
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//class RestTemplateTests {
-//    @LocalServerPort
-//    private var port: Int = 0
-//
-//    @Autowired
-//    private lateinit var restTemplate: TestRestTemplate
-//
-//
-//    @Autowired
-//    private lateinit var repository: AddressBookRepository
-//
-//    private fun url(s: String): String = "http://localhost:${port}/${s}"
-//
-//    private val initialList = listOf(
-//        AddressInfo("Bob", "Toronto"),
-//        AddressInfo("Angela", "New-York"),
-//        AddressInfo("Mathew", "Los-Angeles")
-//    )
-//
-//    @BeforeEach
-//    fun onStart() {
-//        for (elem in initialList) {
-//            repository.add(elem)
-//        }
+//@Configuration
+//class TestRestTemplateConfiguration {
+//    @Bean
+//    fun restTemplate(): RestTemplate {
+//        val restTemplate = RestTemplate()
+//        val factory = HttpComponentsClientHttpRequestFactory()
+//        val build: CloseableHttpClient = HttpClientBuilder.create().disableRedirectHandling().build()
+//        factory.setHttpClient(build)
+//        restTemplate.setRequestFactory(factory)
+//        return restTemplate
 //    }
-//
-//    @AfterEach
-//    fun onFinish() {
-//        repository.clearRepository()
-//    }
-//
+//}
+
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class RestTemplateTests {
+    @LocalServerPort
+    private var port: Int = 0
+
+    private val restTemplateBuilder = RestTemplateBuilder().requestFactory(HttpComponentsClientHttpRequestFactory::class.java)
+    private var restTemplate: TestRestTemplate = TestRestTemplate(restTemplateBuilder)
+
+
+    @Autowired
+    private lateinit var repository: AddressBookRepository
+
+    private fun url(s: String): String = "http://localhost:${port}/${s}"
+
+    private val initialList = listOf(
+        AddressInfo("Bob", "Toronto"),
+        AddressInfo("Angela", "New-York"),
+        AddressInfo("Mathew", "Los-Angeles")
+    )
+
+    @BeforeEach
+    fun onStart() {
+
+
+        for (elem in initialList) {
+            repository.add(elem)
+        }
+    }
+
+    @AfterEach
+    fun onFinish() {
+        repository.clearRepository()
+    }
+
 //    @Test
 //    fun `post auth with wrong credentials`() {
 //        val headers = HttpHeaders()
@@ -113,22 +133,23 @@ package ru.sber.mvcExample
 //            assertThat(resp.body?.get("id${i + 1}")).isEqualTo(initialList[i])
 //        }
 //    }
-//
-//    @Test
-//    fun `get list result in redirect`() {
-//        val headers = HttpHeaders()
-//        headers.contentType = MediaType.APPLICATION_JSON
-//
-//        val resp = restTemplate.exchange(url("api/app/list"),
-//            HttpMethod.GET,
-//            HttpEntity(null, headers),
-//            String::class.java)
-//        println(resp.body)
-//        assertThat(resp.statusCode).isEqualTo(HttpStatus.TEMPORARY_REDIRECT)
-//
-//    }
-//
-//
+
+
+// ok !
+    @Test
+    fun `get list result in redirect to login form`() {
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+
+        val resp = restTemplate.exchange(url("api/app/list"),
+            HttpMethod.GET,
+            HttpEntity(null, headers),
+            Any::class.java)
+        assertThat(resp.statusCode).isEqualTo(HttpStatus.FOUND)
+        assertThat(resp.headers.location?.path).isEqualTo("/login")
+    }
+
+
 //
 //    @Test
 //    fun `get list find one`() {
@@ -234,4 +255,4 @@ package ru.sber.mvcExample
 //
 //        assertThat(resp.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
 //    }
-//}
+}
