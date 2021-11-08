@@ -14,26 +14,11 @@ import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.*
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+import org.springframework.security.test.context.support.WithMockUser
 import ru.sber.mvcExample.repository.AddressBookRepository
 import ru.sber.mvcExample.repository.AddressInfo
 import ru.sber.mvcExample.repository.AddressSearchForm
 import ru.sber.mvcExample.repository.LoginFormModel
-
-
-
-//
-//@Configuration
-//class TestRestTemplateConfiguration {
-//    @Bean
-//    fun restTemplate(): RestTemplate {
-//        val restTemplate = RestTemplate()
-//        val factory = HttpComponentsClientHttpRequestFactory()
-//        val build: CloseableHttpClient = HttpClientBuilder.create().disableRedirectHandling().build()
-//        factory.setHttpClient(build)
-//        restTemplate.setRequestFactory(factory)
-//        return restTemplate
-//    }
-//}
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -58,8 +43,6 @@ class RestTemplateTests {
 
     @BeforeEach
     fun onStart() {
-
-
         for (elem in initialList) {
             repository.add(elem)
         }
@@ -68,6 +51,21 @@ class RestTemplateTests {
     @AfterEach
     fun onFinish() {
         repository.clearRepository()
+    }
+
+
+    // ok !
+    @Test
+    fun `get list result in redirect to login form`() {
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.APPLICATION_JSON
+
+        val resp = restTemplate.exchange(url("api/app/list"),
+            HttpMethod.GET,
+            HttpEntity(null, headers),
+            Any::class.java)
+        assertThat(resp.statusCode).isEqualTo(HttpStatus.FOUND)
+        assertThat(resp.headers.location?.path).isEqualTo("/login")
     }
 
 //    @Test
@@ -99,6 +97,8 @@ class RestTemplateTests {
 //        assertThat(resp?.headers?.get("Location")?.get(0)).isEqualTo(url("api/app/list"))
 //        assertThat(resp?.headers?.get("Set-Cookie")?.find { it.contains("auth=")}).isNotNull
 //    }
+//
+//
 //
 //    @Test
 //    fun `post add request`() {
@@ -133,23 +133,10 @@ class RestTemplateTests {
 //            assertThat(resp.body?.get("id${i + 1}")).isEqualTo(initialList[i])
 //        }
 //    }
-
-
-// ok !
-    @Test
-    fun `get list result in redirect to login form`() {
-        val headers = HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_JSON
-
-        val resp = restTemplate.exchange(url("api/app/list"),
-            HttpMethod.GET,
-            HttpEntity(null, headers),
-            Any::class.java)
-        assertThat(resp.statusCode).isEqualTo(HttpStatus.FOUND)
-        assertThat(resp.headers.location?.path).isEqualTo("/login")
-    }
-
-
+//
+//
+//
+//
 //
 //    @Test
 //    fun `get list find one`() {
